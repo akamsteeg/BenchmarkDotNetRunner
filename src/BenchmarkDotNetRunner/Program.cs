@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using AtleX.CommandLineArguments;
-using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Jobs;
@@ -26,15 +25,17 @@ namespace BenchmarkDotNetRunner
         try
         {
           var config = CreateConfig(arguments);
-          var benchmarks = GetBenchmarks(arguments.BenchmarkAssembly, config) as Benchmark[];
+          var benchmarks = GetBenchmarks(arguments.BenchmarkAssembly, config).ToArray();
 
-
-          BenchmarkRunner.Run(benchmarks, config);
+          foreach (var currentBenchmark in benchmarks)
+          {
+            BenchmarkRunner.Run(currentBenchmark, config);
+          }
         }
         catch (Exception e)
         {
           Console.ForegroundColor = ConsoleColor.Red;
-          Console.WriteLine(e.Message);
+          Console.WriteLine(e);
 
           result = ExitCode.Error;
         }
@@ -57,32 +58,10 @@ namespace BenchmarkDotNetRunner
       return config;
     }
 
-    private static IEnumerable<Benchmark> GetBenchmarks(string assemblyFileName, IConfig benchmarkConfiguration)
+    private static Type[] GetBenchmarks(string assemblyFileName, IConfig benchmarkConfiguration)
     {
-      List<Benchmark> result = new List<Benchmark>();
-
       var benchmarkAssembly = Assembly.LoadFile(assemblyFileName);
-
-      var exportedTypesInAssembly = benchmarkAssembly.GetExportedTypes();
-
-      foreach (var currentType in exportedTypesInAssembly)
-      {
-        var methodsInType = currentType.GetMethods(BindingFlags.Public);
-
-        foreach (var currentMethod in methodsInType)
-        {
-          if (currentMethod.GetCustomAttribute<BenchmarkAttribute>() != null)
-          {
-            var target = new Target(currentType, currentMethod);
-
-            foreach (var currentJob in benchmarkConfiguration.GetJobs())
-            {
-              var benchmark = new Benchmark(target, currentJob, null);
-              result.Add(benchmark);
-            }
-          }
-        }
-      }
+      var result = benchmarkAssembly.GetExportedTypes();
 
       return result;
     }

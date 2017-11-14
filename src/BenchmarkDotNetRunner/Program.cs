@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Reflection;
 using AtleX.CommandLineArguments;
 using BenchmarkDotNet.Configs;
@@ -12,6 +11,15 @@ namespace BenchmarkDotNetRunner
 {
   internal sealed class Program
   {
+    /// <summary>
+    /// The main entry point to the application
+    /// </summary>
+    /// <param name="args">
+    /// The commandline arguments
+    /// </param>
+    /// <returns>
+    /// The exit code
+    /// </returns>
     static int Main(string[] args)
     {
       var result = ExitCode.Success;
@@ -25,7 +33,7 @@ namespace BenchmarkDotNetRunner
         try
         {
           var config = CreateConfig(arguments);
-          var benchmarks = GetBenchmarks(arguments.BenchmarkAssembly, config).ToArray();
+          var benchmarks = GetBenchmarks(arguments.BenchmarkAssembly);
 
           foreach (var currentBenchmark in benchmarks)
           {
@@ -44,6 +52,16 @@ namespace BenchmarkDotNetRunner
       return (int)result;
     }
 
+    /// <summary>
+    /// Create the BenchmarkDotNet <see cref="IConfig"/> based on the specified
+    /// <see cref="CliArguments"/>
+    /// </summary>
+    /// <param name="arguments">
+    /// The <see cref="CliArguments"/> to create the <see cref="IConfig"/> with
+    /// </param>
+    /// <returns>
+    /// A new <see cref="IConfig"/>
+    /// </returns>
     private static IConfig CreateConfig(CliArguments arguments)
     {
       var config = ManualConfig.Create(DefaultConfig.Instance);
@@ -58,7 +76,16 @@ namespace BenchmarkDotNetRunner
       return config;
     }
 
-    private static Type[] GetBenchmarks(string assemblyFileName, IConfig benchmarkConfiguration)
+    /// <summary>
+    /// Get the array of <see cref="Type"/> with all the benchmarks
+    /// </summary>
+    /// <param name="assemblyFileName">
+    /// The filename of the assembly to load the benchmarks from
+    /// </param>
+    /// <returns>
+    /// The array of <see cref="Type"/> with all the benchmarks
+    /// </returns>
+    private static Type[] GetBenchmarks(string assemblyFileName)
     {
       var benchmarkAssembly = Assembly.LoadFile(assemblyFileName);
       var result = benchmarkAssembly.GetExportedTypes();

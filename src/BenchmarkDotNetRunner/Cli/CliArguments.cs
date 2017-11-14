@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using AtleX.CommandLineArguments;
 
 namespace BenchmarkDotNetRunner.Cli
@@ -12,7 +13,7 @@ namespace BenchmarkDotNetRunner.Cli
     /// <summary>
     /// Gets or sets the filename of the assembly with the benchmarks
     /// </summary>
-    [Description("The filename of the assembly with the benchmarks")]
+    [Display(Description = "The filename of the assembly with the benchmarks")]
     public string BenchmarkAssembly
     {
       get;
@@ -22,7 +23,7 @@ namespace BenchmarkDotNetRunner.Cli
     /// <summary>
     /// Gets or sets enabling the BenchmarkDotNet Memory Diagnoser
     /// </summary>
-    [Description("Enable the BenchmarkDotNet Memory Diagnoser for memory statistics")]
+    [Display(Description = "Enable the BenchmarkDotNet Memory Diagnoser for memory statistics")]
     public bool EnableMemoryDiagnoser
     {
       get;
